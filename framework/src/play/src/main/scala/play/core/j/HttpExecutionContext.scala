@@ -26,20 +26,43 @@ object HttpExecutionContext {
  * in the current thread. Actual execution is performed by a delegate ExecutionContext.
  */
 class HttpExecutionContext(contextClassLoader: ClassLoader, httpContext: Http.Context, delegate: ExecutionContext) extends ExecutionContextExecutor {
-  def execute(runnable: Runnable) = delegate.execute(new Runnable {
-    def run() {
-      val thread = Thread.currentThread()
-      val oldContextClassLoader = thread.getContextClassLoader()
-      val oldHttpContext = Http.Context.current.get()
-      thread.setContextClassLoader(contextClassLoader)
-      Http.Context.current.set(httpContext)
-      try {
-        runnable.run()
-      } finally {
-        thread.setContextClassLoader(oldContextClassLoader)
-        Http.Context.current.set(oldHttpContext)
+  override def execute(runnable: Runnable) = delegate.execute(wrapRunnable(runnable))
+
+  override def reportFailure(t: Throwable) = delegate.reportFailure(t)
+
+  override def prepare(): ExecutionContext = {
+    val delegatePrepared = delegate.prepare()
+    if (delegatePrepared eq this) {
+      this
+    } else {
+      wrapPrepared(delegatePrepared)
+    }
+  }
+
+  private def wrapRunnable(runnable: Runnable) = {
+    new Runnable {
+      def run() {
+        val thread = Thread.currentThread()
+        val oldContextClassLoader = thread.getContextClassLoader()
+        val oldHttpContext = Http.Context.current.get()
+        thread.setContextClassLoader(contextClassLoader)
+        Http.Context.current.set(httpContext)
+        try {
+          runnable.run()
+        } finally {
+          thread.setContextClassLoader(oldContextClassLoader)
+          Http.Context.current.set(oldHttpContext)
+        }
       }
     }
-  })
-  def reportFailure(t: Throwable) = delegate.reportFailure(t)
+  }
+
+  private def wrapPrepared(delegate: ExecutionContext): ExecutionContext = {
+    new ExecutionContext {
+      override def reportFailure(t: Throwable): Unit = delegate.reportFailure(t)
+
+      override def execute(runnable: Runnable): Unit = delegate.execute(wrapRunnable(runnable))
+    }
+  }
+
 }
