@@ -87,7 +87,8 @@ object NettyResultStreamer {
             case ServerResultUtils.StreamWithKnownLength(enum) =>
               streamEnum(enum)
             case ServerResultUtils.StreamWithNoBody =>
-              // `StreamWithNoBody` won't add the Content-Length entity-header to the response (if not already present)
+              // Ensure that the body is consumed in case any onDoneEnumerating handlers are registered
+              result.body |>>> Iteratee.ignore
               sendContent()
             case ServerResultUtils.StreamWithStrictBody(body) =>
               // We successfully buffered it, so set the content length and send the whole thing as one buffer
