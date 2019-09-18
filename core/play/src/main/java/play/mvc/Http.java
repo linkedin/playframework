@@ -1017,8 +1017,8 @@ public class Http {
     }
 
     /**
-     * Set a Binary Data to this request using a singleton temp file creator The
-     * <tt>Content-Type</tt> header of the request is set to <tt>application/octet-stream</tt>.
+     * Set a Binary Data to this request using a singleton temp file creator The {@code
+     * Content-Type} header of the request is set to {@code application/octet-stream}.
      *
      * @param data the Binary Data
      * @return the modified builder
@@ -1031,8 +1031,8 @@ public class Http {
     }
 
     /**
-     * Set a Binary Data to this request. The <tt>Content-Type</tt> header of the request is set to
-     * <tt>application/octet-stream</tt>.
+     * Set a Binary Data to this request. The {@code Content-Type} header of the request is set to
+     * {@code application/octet-stream}.
      *
      * @param data the Binary Data
      * @param tempFileCreator the temporary file creator for binary data.
@@ -1045,8 +1045,8 @@ public class Http {
     }
 
     /**
-     * Set a Binary Data to this request using a singleton temporary file creator. The
-     * <tt>Content-Type</tt> header of the request is set to <tt>application/octet-stream</tt>.
+     * Set a Binary Data to this request using a singleton temporary file creator. The {@code
+     * Content-Type} header of the request is set to {@code application/octet-stream}.
      *
      * @param data the Binary Data
      * @return the modified builder
@@ -1057,8 +1057,8 @@ public class Http {
     }
 
     /**
-     * Set a Binary Data to this request. The <tt>Content-Type</tt> header of the request is set to
-     * <tt>application/octet-stream</tt>.
+     * Set a Binary Data to this request. The {@code Content-Type} header of the request is set to
+     * {@code application/octet-stream}.
      *
      * @param data the Binary Data
      * @param tempFileCreator the temporary file creator for binary data.
@@ -1124,8 +1124,8 @@ public class Http {
     }
 
     /**
-     * Set a Json Body to this request. The <tt>Content-Type</tt> header of the request is set to
-     * <tt>application/json</tt>.
+     * Set a Json Body to this request. The {@code Content-Type} header of the request is set to
+     * {@code application/json}.
      *
      * @param node the Json Node
      * @return this builder, updated
@@ -1135,8 +1135,8 @@ public class Http {
     }
 
     /**
-     * Set a Json Body to this request. The <tt>Content-Type</tt> header of the request is set to
-     * <tt>application/json</tt>.
+     * Set a Json Body to this request. The {@code Content-Type} header of the request is set to
+     * {@code application/json}.
      *
      * @param json the JsValue
      * @return the modified builder
@@ -1146,8 +1146,8 @@ public class Http {
     }
 
     /**
-     * Set a XML to this request. The <tt>Content-Type</tt> header of the request is set to
-     * <tt>application/xml</tt>.
+     * Set a XML to this request. The {@code Content-Type} header of the request is set to {@code
+     * application/xml}.
      *
      * @param xml the XML
      * @return the modified builder
@@ -1159,7 +1159,7 @@ public class Http {
     /**
      * Set a XML to this request.
      *
-     * <p>The <tt>Content-Type</tt> header of the request is set to <tt>application/xml</tt>.
+     * <p>The {@code Content-Type} header of the request is set to {@code application/xml}.
      *
      * @param xml the XML
      * @return the modified builder
@@ -1169,8 +1169,8 @@ public class Http {
     }
 
     /**
-     * Set a Text to this request. The <tt>Content-Type</tt> header of the request is set to
-     * <tt>text/plain</tt>.
+     * Set a Text to this request. The {@code Content-Type} header of the request is set to {@code
+     * text/plain}.
      *
      * @param text the text
      * @return this builder, updated
