@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @see ServerCookieDecoder
  */
-public final class ServerCookieEncoder extends CookieEncoder {
+public class ServerCookieEncoder extends CookieEncoder {
 
     /**
      * Strict encoder that validates that name and value chars are in the valid scope

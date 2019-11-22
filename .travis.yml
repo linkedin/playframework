@@ -1,7 +1,7 @@
 language: scala
 sudo: false
 jdk:
-  - oraclejdk8
+  - openjdk8
 env:
   # Define scripts here so they run concurrently
   - SCRIPT=codeChecks
