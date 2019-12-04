@@ -6,6 +6,7 @@ package play.api.http
 import com.typesafe.config.ConfigFactory
 import org.specs2.mutable.Specification
 import play.api.{ PlayException, Configuration }
+import play.api.mvc.Cookie
 import play.core.netty.utils.{ ClientCookieEncoder, ClientCookieDecoder, ServerCookieDecoder, ServerCookieEncoder }
 
 object HttpConfigurationSpec extends Specification {
@@ -26,9 +27,11 @@ object HttpConfigurationSpec extends Specification {
         "play.http.session.maxAge" -> "10s",
         "play.http.session.httpOnly" -> "true",
         "play.http.session.domain" -> "playframework.com",
+        "play.http.session.sameSite" -> "lax",
         "play.http.flash.cookieName" -> "PLAY_FLASH",
         "play.http.flash.secure" -> "true",
-        "play.http.flash.httpOnly" -> "true"
+        "play.http.flash.httpOnly" -> "true",
+        "play.http.flash.sameSite" -> "lax"
       )
     }
 
@@ -86,6 +89,11 @@ object HttpConfigurationSpec extends Specification {
         val httpConfiguration = new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.session.domain must beEqualTo(Some("playframework.com"))
       }
+
+      "cookie samesite" in {
+        val httpConfiguration = new HttpConfiguration.HttpConfigurationProvider(configuration).get
+        httpConfiguration.session.sameSite must beEqualTo(Some(Cookie.SameSite.Lax))
+      }
     }
 
     "configure flash should set" in {
@@ -103,6 +111,11 @@ object HttpConfigurationSpec extends Specification {
       "cookie httpOnly" in {
         val httpConfiguration = new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.flash.httpOnly must beTrue
+      }
+
+      "cookie samesite" in {
+        val httpConfiguration = new HttpConfiguration.HttpConfigurationProvider(configuration).get
+        httpConfiguration.flash.sameSite must beEqualTo(Some(Cookie.SameSite.Lax))
       }
     }
   }

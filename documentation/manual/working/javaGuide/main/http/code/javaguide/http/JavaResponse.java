@@ -102,7 +102,8 @@ public class JavaResponse extends WithApplication {
                 "/some/path",   // path
                 ".example.com", // domain
                 false,          // secure
-                true            // http only
+                true,           // http only
+                Cookie.SameSite.NONE
         );
         //#detailed-set-cookie
         Cookie cookie = response().cookies().iterator().next();
@@ -113,6 +114,7 @@ public class JavaResponse extends WithApplication {
         assertThat(cookie.domain(), equalTo(".example.com"));
         assertThat(cookie.secure(), equalTo(false));
         assertThat(cookie.httpOnly(), equalTo(true));
+        assertThat(cookie.sameSite().get(), equalTo(Cookie.SameSite.NONE));
         removeContext();
     }
 

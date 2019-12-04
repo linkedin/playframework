@@ -24,7 +24,7 @@ trait JavaHelpers {
   def cookiesToScalaCookies(cookies: java.lang.Iterable[play.mvc.Http.Cookie]): Seq[Cookie] = {
     cookies.asScala.toSeq map { c =>
       Cookie(c.name, c.value,
-        if (c.maxAge == null) None else Some(c.maxAge), c.path, Option(c.domain), c.secure, c.httpOnly)
+        if (c.maxAge == null) None else Some(c.maxAge), c.path, Option(c.domain), c.secure, c.httpOnly, if (c.sameSite().isPresent) Some(c.sameSite().get().asScala()) else None)
     }
   }
 
@@ -41,7 +41,8 @@ trait JavaHelpers {
           cookie.path,
           cookie.domain.orNull,
           cookie.secure,
-          cookie.httpOnly)
+          cookie.httpOnly,
+          cookie.sameSite.map(_.asJava).orNull)
       }
 
       def iterator: java.util.Iterator[JCookie] = {

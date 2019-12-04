@@ -246,7 +246,10 @@ object PlayBuild extends Build {
   lazy val PlayNettyUtilsProject = PlayNonCrossBuiltProject("Play-Netty-Utils", "play-netty-utils")
     .settings(
       javacOptions in (Compile,doc) += "-Xdoclint:none",
-      libraryDependencies ++= nettyUtilsDependencies
+      libraryDependencies ++= nettyUtilsDependencies,
+      binaryIssueFilters := Seq(
+        ProblemFilters.exclude[MissingMethodProblem]("play.core.netty.utils.Cookie.sameSite")
+      )
     )
 
   lazy val PlayProject = PlayCrossBuiltProject("Play", "play")
@@ -256,7 +259,31 @@ object PlayBuild extends Build {
       libraryDependencies ++= runtime(scalaVersion.value) ++ scalacheckDependencies,
       binaryIssueFilters := Seq(
         // Needed so compile-time DI can use temporary files, raw request bodies
-        ProblemFilters.exclude[MissingMethodProblem]("play.api.BuiltInComponents.tempFileCreator")
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.BuiltInComponents.tempFileCreator"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.mvc.Http#RequestHeader.clientCertificateChain"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.mvc.Http#Response.setCookie"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.mvc.Http#Cookie.this"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.RequestImpl.copy"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.RequestImpl.this"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.Cookie.copy"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.Cookie.this"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.RequestHeaderImpl.copy"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.RequestHeaderImpl.this"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.CookieBaker.sameSite"),
+        ProblemFilters.exclude[MissingTypesProblem]("play.api.mvc.Cookie$"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.Cookie.apply"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.RequestHeader.copy"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.RequestHeader.copy$default$11"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.RequestHeader.clientCertificateChain"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.mvc.WrappedRequest.copy"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.http.SessionConfiguration.copy"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.http.SessionConfiguration.this"),
+        ProblemFilters.exclude[MissingTypesProblem]("play.api.http.SessionConfiguration$"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.http.SessionConfiguration.apply"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.http.FlashConfiguration.copy"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.http.FlashConfiguration.this"),
+        ProblemFilters.exclude[MissingTypesProblem]("play.api.http.FlashConfiguration$"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.http.FlashConfiguration.apply")
       ),
 
       sourceGenerators in Compile <+= (version, scalaVersion, sbtVersion, sourceManaged in Compile) map PlayVersion,
@@ -420,7 +447,10 @@ object PlayBuild extends Build {
       parallelExecution in Test := false,
       binaryIssueFilters := Seq(
         // play.test.Helpers.invokeWithContext was made static
-        ProblemFilters.exclude[MissingMethodProblem]("play.test.Helpers.invokeWithContext")
+        ProblemFilters.exclude[MissingMethodProblem]("play.test.Helpers.invokeWithContext"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.test.FakeRequest.copy"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.test.FakeRequest.this"),
+        ProblemFilters.exclude[MissingMethodProblem]("play.api.test.FakeRequest.apply")
       )
     ).dependsOn(PlayNettyServerProject)
 

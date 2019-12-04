@@ -63,7 +63,7 @@ public class AddCSRFTokenAction extends Action<AddCSRFToken> {
             if (config.cookieName().isDefined()) {
                 Option<String> domain = Session.domain();
                 ctx.response().setCookie(config.cookieName().get(), newToken, null, Session.path(),
-                        domain.isDefined() ? domain.get() : null, config.secureCookie(), config.httpOnlyCookie());
+                        domain.isDefined() ? domain.get() : null, config.secureCookie(), config.httpOnlyCookie(), null);
             } else {
                 ctx.session().put(config.tokenName(), newToken);
             }

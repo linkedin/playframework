@@ -507,6 +507,11 @@ package play.api.mvc {
     def path = "/"
 
     /**
+     * The value of the SameSite attribute of the cookie. Defaults to no SameSite.
+     */
+    def sameSite: Option[Cookie.SameSite] = None
+
+    /**
      * Encodes the data as a `String`.
      */
     def encode(data: Map[String, String]): String = {
@@ -567,7 +572,7 @@ package play.api.mvc {
      */
     def encodeAsCookie(data: T): Cookie = {
       val cookie = encode(serialize(data))
-      Cookie(COOKIE_NAME, cookie, maxAge, path, domain, secure, httpOnly)
+      Cookie(COOKIE_NAME, cookie, maxAge, path, domain, secure, httpOnly, sameSite)
     }
 
     /**
@@ -672,6 +677,7 @@ package play.api.mvc {
     override def httpOnly = HttpConfiguration.current.session.httpOnly
     override def path = HttpConfiguration.current.context
     override def domain = HttpConfiguration.current.session.domain
+    override def sameSite = HttpConfiguration.current.session.sameSite
 
     def deserialize(data: Map[String, String]) = new Session(data)
 
@@ -741,6 +747,7 @@ package play.api.mvc {
     override def secure = HttpConfiguration.current.flash.secure
     override def httpOnly = HttpConfiguration.current.flash.httpOnly
     override def domain = HttpConfiguration.current.session.domain
+    override def sameSite = HttpConfiguration.current.flash.sameSite
 
     val emptyCookie = new Flash
 
@@ -760,8 +767,9 @@ package play.api.mvc {
    * @param domain the cookie domain
    * @param secure whether this cookie is secured, sent only for HTTPS requests
    * @param httpOnly whether this cookie is HTTP only, i.e. not accessible from client-side JavaScipt code
+   * @param sameSite defines cookie access restriction: first-party or same-site context
    */
-  case class Cookie(name: String, value: String, maxAge: Option[Int] = None, path: String = "/", domain: Option[String] = None, secure: Boolean = false, httpOnly: Boolean = true)
+  case class Cookie(name: String, value: String, maxAge: Option[Int] = None, path: String = "/", domain: Option[String] = None, secure: Boolean = false, httpOnly: Boolean = true, sameSite: Option[Cookie.SameSite] = None)
 
   /**
    * A cookie to be discarded.  This contains only the data necessary for discarding a cookie.
@@ -773,6 +781,23 @@ package play.api.mvc {
    */
   case class DiscardingCookie(name: String, path: String = "/", domain: Option[String] = None, secure: Boolean = false) {
     def toCookie = Cookie(name, "", Some(-86400), path, domain, secure)
+  }
+
+  object Cookie {
+
+    sealed abstract class SameSite(val value: String) {
+      private def matches(v: String): Boolean = value equalsIgnoreCase v
+
+      def asJava: play.mvc.Http.Cookie.SameSite = play.mvc.Http.Cookie.SameSite.parse(value).get
+    }
+
+    object SameSite {
+      private[play] val values: Seq[SameSite]    = Seq(Strict, Lax, None)
+      def parse(value: String): Option[SameSite] = values.find(_.matches(value))
+      case object Strict extends SameSite("Strict")
+      case object Lax extends SameSite("Lax")
+      case object None extends SameSite("None")
+    }
   }
 
   /**
@@ -858,6 +883,7 @@ package play.api.mvc {
         c.domain.foreach(nc.setDomain)
         nc.setSecure(c.secure)
         nc.setHttpOnly(c.httpOnly)
+        nc.setSameSite(c.sameSite.map(_.value).orNull)
         encoder.encode(nc)
       }
       newCookies.mkString(SetCookieHeaderSeparator)
@@ -897,7 +923,8 @@ package play.api.mvc {
             Option(cookie.path).getOrElse("/"),
             Option(cookie.domain),
             cookie.isSecure,
-            cookie.isHttpOnly
+            cookie.isHttpOnly,
+            Option(cookie.sameSite).flatMap(Cookie.SameSite.parse)
           )
         }
       }.getOrElse {

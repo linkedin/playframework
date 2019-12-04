@@ -196,7 +196,7 @@ public class Http {
                 this.lang = lang;
                 scala.Option<String> domain = play.api.mvc.Session.domain();
                 response.setCookie(Play.langCookieName(), lang.code(), null, play.api.mvc.Session.path(),
-                    domain.isDefined() ? domain.get() : null, Play.langCookieSecure(), Play.langCookieHttpOnly());
+                    domain.isDefined() ? domain.get() : null, Play.langCookieSecure(), Play.langCookieHttpOnly(), Cookie.SameSite.LAX);
                 return true;
             } else {
                 return false;
@@ -1462,7 +1462,7 @@ public class Http {
          * @param domain Cookie domain
          */
         public void setCookie(String name, String value, Integer maxAge, String path, String domain) {
-            setCookie(name, value, maxAge, path, domain, false, false);
+            setCookie(name, value, maxAge, path, domain, false, false, null);
         }
 
         /**
@@ -1475,8 +1475,8 @@ public class Http {
          * @param secure Whether the cookie is secured (for HTTPS requests)
          * @param httpOnly Whether the cookie is HTTP only (i.e. not accessible from client-side JavaScript code)
          */
-        public void setCookie(String name, String value, Integer maxAge, String path, String domain, boolean secure, boolean httpOnly) {
-            cookies.add(new Cookie(name, value, maxAge, path, domain, secure, httpOnly));
+        public void setCookie(String name, String value, Integer maxAge, String path, String domain, boolean secure, boolean httpOnly, Cookie.SameSite sameSite) {
+            cookies.add(new Cookie(name, value, maxAge, path, domain, secure, httpOnly, sameSite));
         }
 
         /**
@@ -1518,7 +1518,7 @@ public class Http {
          * @param secure Whether the cookie to discard is secure
          */
         public void discardCookie(String name, String path, String domain, boolean secure) {
-            cookies.add(new Cookie(name, "", -86400, path, domain, secure, false));
+            cookies.add(new Cookie(name, "", -86400, path, domain, secure, false, null));
         }
 
         public Collection<Cookie> cookies() {
@@ -1644,9 +1644,10 @@ public class Http {
         private final String domain;
         private final boolean secure;
         private final boolean httpOnly;
+        private final SameSite sameSite;
 
         public Cookie(String name, String value, Integer maxAge, String path,
-                      String domain, boolean secure, boolean httpOnly) {
+                      String domain, boolean secure, boolean httpOnly, SameSite sameSite) {
             this.name = name;
             this.value = value;
             this.maxAge = maxAge;
@@ -1654,6 +1655,7 @@ public class Http {
             this.domain = domain;
             this.secure = secure;
             this.httpOnly = httpOnly;
+            this.sameSite = sameSite;
         }
 
         /**
@@ -1704,6 +1706,43 @@ public class Http {
          */
         public boolean httpOnly() {
             return httpOnly;
+        }
+
+        /**
+         * @return the SameSite attribute for this cookie
+         */
+        public Optional<SameSite> sameSite() {
+            return Optional.ofNullable(sameSite);
+        }
+
+        /**
+         * The cookie SameSite attribute
+         */
+        public enum SameSite {
+            STRICT("Strict"), LAX("Lax"), NONE("None");
+
+            private final String value;
+
+            SameSite(String value) {
+                this.value = value;
+            }
+
+            public String value() {
+                return this.value;
+            }
+
+            public play.api.mvc.Cookie.SameSite asScala() {
+                return play.api.mvc.Cookie.SameSite$.MODULE$.parse(value).get();
+            }
+
+            public static Optional<SameSite> parse(String sameSite) {
+                for (SameSite value : values()) {
+                    if (value.value.equalsIgnoreCase(sameSite)) {
+                        return Optional.of(value);
+                    }
+                }
+                return Optional.empty();
+            }
         }
 
     }
