@@ -67,7 +67,8 @@ object JavaResultExtractor {
           cookie.path,
           cookie.domain.orNull,
           cookie.secure,
-          cookie.httpOnly)
+          cookie.httpOnly,
+          cookie.sameSite.map(_.asJava).orNull)
       }
 
       def iterator: java.util.Iterator[JCookie] = {

@@ -84,6 +84,25 @@ object CookiesSpec extends Specification {
       }
       myCookie must beEqualTo(cookie1)
     }
+
+    "handle SameSite cookies properly" in {
+      val decoded = Cookies.decodeSetCookieHeader("cookie=value; Secure; SameSite=Strict")
+      decoded must contain(Cookie("cookie", "value", secure = true, httpOnly = false, sameSite = Some(Cookie.SameSite.Strict)))
+    }
+
+    "handle SameSite=None cookie properly" in {
+      val decoded = Cookies.decodeSetCookieHeader("cookie=value; Secure; SameSite=None")
+      decoded must contain(
+        Cookie("cookie", "value", secure = true, httpOnly = false, sameSite = Some(Cookie.SameSite.None))
+      )
+    }
+
+    "handle SameSite=Lax cookie properly" in {
+      val decoded = Cookies.decodeSetCookieHeader("cookie=value; Secure; SameSite=Lax")
+      decoded must contain(
+        Cookie("cookie", "value", secure = true, httpOnly = false, sameSite = Some(Cookie.SameSite.Lax))
+      )
+    }
   }
 
   "merging cookies" should {
@@ -106,6 +125,24 @@ object CookiesSpec extends Specification {
         Cookie("bar", "bar"),
         Cookie("baz", "baz")
       )
+    }
+  }
+
+  "object Cookie.SameSite#parse" should {
+    "successfully parse SameSite.None value" in {
+      Cookie.SameSite.parse("None") must beSome[Cookie.SameSite](Cookie.SameSite.None)
+    }
+
+    "successfully parse SameSite.Lax value" in {
+      Cookie.SameSite.parse("Lax") must beSome[Cookie.SameSite](Cookie.SameSite.Lax)
+    }
+
+    "successfully parse SameSite.Strict value" in {
+      Cookie.SameSite.parse("Strict") must beSome[Cookie.SameSite](Cookie.SameSite.Strict)
+    }
+
+    "return Option.None for unknown SameSite value" in {
+      Cookie.SameSite.parse("Unknown") must beNone
     }
   }
 }

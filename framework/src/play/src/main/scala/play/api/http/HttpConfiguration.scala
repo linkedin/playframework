@@ -6,7 +6,8 @@ package play.api.http
 import javax.inject.{ Singleton, Inject, Provider }
 
 import com.typesafe.config.ConfigMemorySize
-import play.api.{ PlayConfig, Application, Play, Configuration }
+import play.api.{ PlayConfig, Application, Play, Configuration, Logger }
+import play.api.mvc.Cookie.SameSite
 import play.core.netty.utils.{ ServerCookieDecoder, ClientCookieEncoder, ClientCookieDecoder, ServerCookieEncoder }
 
 import scala.concurrent.duration.FiniteDuration
@@ -61,10 +62,11 @@ case class CookiesConfiguration(
  * @param maxAge The max age of the session, none, use "session" sessions
  * @param httpOnly Whether the HTTP only attribute of the cookie should be set
  * @param domain The domain to set for the session cookie, if defined
+ * @param sameSite The cookie's SameSite attribute
  */
 case class SessionConfiguration(cookieName: String = "PLAY_SESSION", secure: Boolean = false,
   maxAge: Option[FiniteDuration] = None, httpOnly: Boolean = true,
-  domain: Option[String] = None)
+  domain: Option[String] = None, sameSite: Option[SameSite] = Some(SameSite.Lax))
 
 /**
  * The flash configuration
@@ -72,8 +74,9 @@ case class SessionConfiguration(cookieName: String = "PLAY_SESSION", secure: Boo
  * @param cookieName The name of the cookie used to store the session
  * @param secure Whether the flash cookie should set the secure flag or not
  * @param httpOnly Whether the HTTP only attribute of the cookie should be set
+ * @param sameSite The cookie's SameSite attribute
  */
-case class FlashConfiguration(cookieName: String = "PLAY_FLASH", secure: Boolean = false, httpOnly: Boolean = true)
+case class FlashConfiguration(cookieName: String = "PLAY_FLASH", secure: Boolean = false, httpOnly: Boolean = true, sameSite: Option[SameSite] = Some(SameSite.Lax))
 
 /**
  * Configuration for body parsers.
@@ -98,6 +101,20 @@ object HttpConfiguration {
   @Singleton
   class HttpConfigurationProvider @Inject() (configuration: Configuration) extends Provider[HttpConfiguration] {
     lazy val get = fromConfiguration(configuration)
+  }
+
+  private val logger = Logger(classOf[HttpConfiguration])
+
+  private def parseSameSite(config: PlayConfig, key: String): Option[SameSite] = {
+    config.getOptional[String](key).flatMap { value =>
+      val result = SameSite.parse(value)
+      if (result.isEmpty) {
+        logger.warn(
+          s"""Assuming $key = null, since "$value" is not a valid SameSite value (${SameSite.values.mkString(", ")})"""
+        )
+      }
+      result
+    }
   }
 
   def fromConfiguration(configuration: Configuration) = {
@@ -128,12 +145,14 @@ object HttpConfiguration {
         secure = config.getDeprecated[Boolean]("play.http.session.secure", "session.secure"),
         maxAge = config.getOptionalDeprecated[FiniteDuration]("play.http.session.maxAge", "session.maxAge"),
         httpOnly = config.getDeprecated[Boolean]("play.http.session.httpOnly", "session.httpOnly"),
-        domain = config.getOptionalDeprecated[String]("play.http.session.domain", "session.domain")
+        domain = config.getOptionalDeprecated[String]("play.http.session.domain", "session.domain"),
+        sameSite = parseSameSite(config, "play.http.session.sameSite")
       ),
       flash = FlashConfiguration(
         cookieName = config.getDeprecated[String]("play.http.flash.cookieName", "flash.cookieName"),
         secure = config.get[Boolean]("play.http.flash.secure"),
-        httpOnly = config.get[Boolean]("play.http.flash.httpOnly")
+        httpOnly = config.get[Boolean]("play.http.flash.httpOnly"),
+        sameSite = parseSameSite(config, "play.http.flash.sameSite")
       )
     )
   }
