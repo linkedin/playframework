@@ -5,10 +5,9 @@
 package play.core.server
 
 import java.util.function.{ Function => JFunction }
-
 import com.typesafe.config.ConfigFactory
 import play.api.ApplicationLoader.Context
-import play.api.http.DefaultHttpErrorHandler
+import play.api.http.DevHttpErrorHandler
 import play.api.http.HttpErrorHandler
 import play.api.http.Port
 import play.api.routing.Router
@@ -109,7 +108,8 @@ object Server {
    */
   private[server] def getHandlerFor(
       request: RequestHeader,
-      applicationProvider: ApplicationProvider
+      applicationProvider: ApplicationProvider,
+      fallbackErrorHandler: HttpErrorHandler
   ): Either[Future[Result], (RequestHeader, Handler)] = {
 
     def handleErrors(errorHandler: HttpErrorHandler): Throwable => Left[Future[Result], Nothing] = {
@@ -143,11 +143,11 @@ object Server {
               // The ApplicationProvider couldn't give us an application.
               // This usually means there was a compile error or a problem
               // starting the application.
-              handleErrors(DefaultHttpErrorHandler)(e)
+              handleErrors(fallbackErrorHandler)(e)
           }
       }
     } catch {
-      case e: Throwable => handleErrors(DefaultHttpErrorHandler)(e)
+      case e: Throwable => handleErrors(fallbackErrorHandler)(e)
     }
   }
 

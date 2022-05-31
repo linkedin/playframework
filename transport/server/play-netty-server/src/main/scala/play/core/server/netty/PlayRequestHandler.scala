@@ -21,6 +21,7 @@ import play.api.mvc._
 import play.api.Application
 import play.api.Logger
 import play.core.ApplicationProvider
+import play.api.Mode
 import play.core.server.NettyServer
 import play.core.server.Server
 import play.core.server.common.ReloadCache
@@ -121,7 +122,7 @@ private[play] class PlayRequestHandler(val server: NettyServer, val serverHeader
 
           override def get: Try[Application] = tryApp
         }
-        Server.getHandlerFor(debugHeader, sameAppProvider) match {
+        Server.getHandlerFor(debugHeader, sameAppProvider, fallbackErrorHandler) match {
 
           case Left(directResult) =>
             debugHeader -> Left(directResult)
@@ -347,8 +348,13 @@ private[play] class PlayRequestHandler(val server: NettyServer, val serverHeader
   private def errorHandler(tryApp: Try[Application]): HttpErrorHandler =
     tryApp match {
       case Success(app) => app.errorHandler
-      case Failure(_)   => DefaultHttpErrorHandler
+      case Failure(_)   => fallbackErrorHandler
     }
+
+  private lazy val fallbackErrorHandler = server.mode match {
+    case Mode.Prod => DefaultHttpErrorHandler
+    case _         => DevHttpErrorHandler
+  }
 
   /**
    * Sends a simple response with no body, then closes the connection.
