@@ -409,7 +409,7 @@ lazy val publishedProjects = Seq[ProjectReference](
   PlaySpecs2Project,
   PlayTestProject,
   PlayExceptionsProject,
-  //PlayDocsProject,
+  PlayDocsProject,
   PlayFiltersHelpersProject,
   PlayIntegrationTestProject,
   PlayDocsSbtPlugin,
