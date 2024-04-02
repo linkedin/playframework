@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.api.mvc
 
 import java.net.URLDecoder
@@ -37,6 +38,7 @@ import scala.util.control.NonFatal
  * @param domain the cookie domain
  * @param secure whether this cookie is secured, sent only for HTTPS requests
  * @param httpOnly whether this cookie is HTTP only, i.e. not accessible from client-side JavaScript code
+ * @param sameSite defines cookie access restriction: first-party or same-site context
  */
 case class Cookie(
     name: String,
@@ -72,10 +74,11 @@ object Cookie {
     def asJava: play.mvc.Http.Cookie.SameSite = play.mvc.Http.Cookie.SameSite.parse(value).get
   }
   object SameSite {
-    private[play] val values: Seq[SameSite]    = Seq(Strict, Lax)
+    private[play] val values: Seq[SameSite]    = Seq(Strict, Lax, None)
     def parse(value: String): Option[SameSite] = values.find(_.matches(value))
     case object Strict extends SameSite("Strict")
     case object Lax    extends SameSite("Lax")
+    case object None   extends SameSite("None")
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
 
 import com.typesafe.play.docs.sbtplugin.Imports._
@@ -8,8 +8,8 @@ import com.typesafe.play.sbt.enhancer.PlayEnhancer
 import play.core.PlayVersion
 import sbt._
 
-import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
-import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport._
+import de.heikoseeberger.sbtheader.FileType
+import de.heikoseeberger.sbtheader.CommentStyle
 
 val DocsApplication = config("docs").hide
 
@@ -60,12 +60,15 @@ lazy val main = Project("Play-Documentation", file("."))
     unmanagedResourceDirectories in Test ++= (baseDirectory.value / "manual" / "detailedTopics" ** "code").get,
     // Don't include sbt files in the resources
     excludeFilter in (Test, unmanagedResources) := (excludeFilter in (Test, unmanagedResources)).value || "*.sbt",
-    crossScalaVersions := Seq(PlayVersion.scalaVersion, "2.11.12"),
+    crossScalaVersions := Seq(PlayVersion.scalaVersion),
     scalaVersion := PlayVersion.scalaVersion,
     fork in Test := true,
     javaOptions in Test ++= Seq("-Xmx512m", "-Xms128m"),
-    headerEmptyLine := false,
-    headerLicense := Some(HeaderLicense.Custom("Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>")),
+    headerLicense := Some(HeaderLicense.Custom("Copyright (C) Lightbend Inc. <https://www.lightbend.com>")),
+    headerMappings ++= Map(
+      FileType.xml  -> CommentStyle.xmlStyleBlockComment,
+      FileType.conf -> CommentStyle.hashLineComment
+    ),
     sourceDirectories in javafmt in Test ++= (unmanagedSourceDirectories in Test).value,
     sourceDirectories in javafmt in Test ++= (unmanagedResourceDirectories in Test).value,
     // No need to show eviction warnings for Play documentation.

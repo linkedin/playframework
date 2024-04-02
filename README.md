@@ -1,3 +1,17 @@
+# Publish Locally
+
+```
+;set every publishMavenStyle := false;set every publishTo := Some(Resolver.file("local-repo", file(System.getProperty("user.home")) / "local-repo")(Patterns(Vector("[orgPath]/[module]/[revision]/[module]-[revision].ivy"),Vector("[orgPath]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"), true, false, false)));clean;++2.12.15 publish
+```
+
+## Update local-repo ivy files
+
+```
+find ~/local-repo -type f -name "*<version>.ivy" -exec sed -i.bak 's/\<conf name=\"compile\" visibility=\"public\" description=\"\"\/\>/\<conf name=\"compile\" visibility=\"public\" description=\"\"\/>\
+\<conf name=\"default\" visibility=\"public\" description=\"\" extends=\"compile\"\/\>/' "{}" +;"
+# ^replace <version> with the version you just published
+```
+
 [![Gitter](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/playframework/playframework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [<img src="https://img.shields.io/travis/playframework/playframework.svg"/>](https://travis-ci.org/playframework/playframework) [![Maven](https://img.shields.io/maven-central/v/com.typesafe.play/play_2.11.svg)](http://mvnrepository.com/artifact/com.typesafe.play/play_2.11)
 
 
@@ -20,7 +34,7 @@ The Play Framework combines productivity and performance making it easy to build
 
 ### License
 
-Copyright (C) 2009-2019 Lightbend Inc. (https://www.lightbend.com).
+Copyright (C) Lightbend Inc. (https://www.lightbend.com).
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
 

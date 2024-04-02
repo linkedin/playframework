@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+# Copyright (C) Lightbend Inc. <https://www.lightbend.com>
 
 # shellcheck source=scripts/scriptLib
 . "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/scriptLib"
@@ -14,7 +14,7 @@ scalafmtValidation "framework"
 javafmtValidation "framework"
 
 printMessage "VALIDATE FILE LICENSE HEADERS"
-runSbtNoisy headerCheck test:headerCheck
+runSbtNoisy +headerCheck +test:headerCheck
 
 
 printMessage "RUNNING WHITESOURCE REPORT"

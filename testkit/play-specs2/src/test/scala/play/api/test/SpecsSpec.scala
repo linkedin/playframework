@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.api.test
 
 import com.google.inject.AbstractModule
@@ -11,7 +12,6 @@ import play.api.Play
 import play.api.Application
 
 class SpecsSpec extends Specification {
-
   def getConfig(key: String)(implicit app: Application) = app.configuration.getOptional[String](key)
 
   "WithApplication context" should {
@@ -27,7 +27,7 @@ class SpecsSpec extends Specification {
 
   "WithApplicationLoader" should {
     val myModule = new AbstractModule {
-      def configure() = bind(classOf[Int]).toInstance(42)
+      override def configure() = bind(classOf[Int]).toInstance(42)
     }
     val builder = new GuiceApplicationBuilder().bindings(myModule)
     class WithMyApplicationLoader extends WithApplicationLoader(new GuiceApplicationLoader(builder))

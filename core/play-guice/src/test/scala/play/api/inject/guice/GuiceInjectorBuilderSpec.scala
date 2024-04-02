@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.api.inject
 package guice
 
@@ -248,7 +249,7 @@ object GuiceInjectorBuilderSpec {
   }
 
   class SetConfigurationModule(conf: Configuration) extends AbstractModule {
-    def configure() = bind(classOf[Configuration]).toInstance(conf)
+    override def configure() = bind(classOf[Configuration]).toInstance(conf)
   }
 
   class ClassLoaderAware {
@@ -260,24 +261,23 @@ object GuiceInjectorBuilderSpec {
   class A1 extends A
 
   class AModule extends AbstractModule {
-    def configure() = bind(classOf[A]) to classOf[A1]
+    override def configure() = bind(classOf[A]) to classOf[A1]
   }
 
   trait B
   class B1 extends B
 
   class BModule extends AbstractModule {
-    def configure() = bind(classOf[B]) to classOf[B1]
+    override def configure() = bind(classOf[B]) to classOf[B1]
   }
 
   trait C
   class C1 extends C
 
   class CModule extends AbstractModule {
-    def configure() = bind(classOf[C]) to classOf[C1]
+    override def configure() = bind(classOf[C]) to classOf[C1]
   }
 
   trait D
   class D1 extends D
-
 }

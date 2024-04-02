@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.api.mvc
 
 import controllers.Assets.Asset
@@ -570,7 +571,7 @@ object QueryStringBindable {
     new QueryStringBindable[T] {
       def bind(key: String, params: Map[String, Seq[String]]) = {
         try {
-          val o = ct.runtimeClass.newInstance.asInstanceOf[T].bind(key, params.mapValues(_.toArray).asJava)
+          val o = ct.runtimeClass.getDeclaredConstructor().newInstance().asInstanceOf[T].bind(key, params.mapValues(_.toArray).asJava)
           if (o.isPresent) {
             Some(Right(o.get))
           } else {
@@ -583,9 +584,8 @@ object QueryStringBindable {
       def unbind(key: String, value: T) = {
         value.unbind(key)
       }
-      override def javascriptUnbind =
-        Option(ct.runtimeClass.newInstance.asInstanceOf[T].javascriptUnbind())
-          .getOrElse(super.javascriptUnbind)
+      override def javascriptUnbind = Option(ct.runtimeClass.getDeclaredConstructor().newInstance().asInstanceOf[T].javascriptUnbind())
+        .getOrElse(super.javascriptUnbind)
     }
 
 }
@@ -757,6 +757,7 @@ object PathBindable {
       def bind(key: String, value: String) = {
         try {
           Right(ct.runtimeClass.newInstance.asInstanceOf[T].bind(key, value))
+          Right(ct.runtimeClass.getDeclaredConstructor().newInstance().asInstanceOf[T].bind(key, value))
         } catch {
           case e: Exception => Left(e.getMessage)
         }
@@ -764,9 +765,8 @@ object PathBindable {
       def unbind(key: String, value: T) = {
         value.unbind(key)
       }
-      override def javascriptUnbind =
-        Option(ct.runtimeClass.newInstance.asInstanceOf[T].javascriptUnbind())
-          .getOrElse(super.javascriptUnbind)
+      override def javascriptUnbind = Option(ct.runtimeClass.getDeclaredConstructor().newInstance().asInstanceOf[T].javascriptUnbind())
+        .getOrElse(super.javascriptUnbind)
     }
 
   /**

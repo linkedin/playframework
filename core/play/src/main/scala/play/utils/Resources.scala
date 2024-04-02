@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.utils
 
 import java.net.JarURLConnection
@@ -9,8 +10,6 @@ import java.net.URI
 import java.net.URL
 import java.io.File
 import java.util.zip.ZipFile
-
-import sun.net.www.protocol.file.FileURLConnection
 
 /**
  * Provide resources helpers
@@ -33,7 +32,7 @@ object Resources {
    * this returns false.
    */
   def isUrlConnectionADirectory(urlConnection: URLConnection) = urlConnection match {
-    case file: FileURLConnection => new File(file.getURL.toURI).isDirectory
+    case file if file.getURL.getProtocol == "file" => new File(file.getURL.toURI).isDirectory
     case jar: JarURLConnection =>
       if (jar.getJarEntry.isDirectory) {
         true

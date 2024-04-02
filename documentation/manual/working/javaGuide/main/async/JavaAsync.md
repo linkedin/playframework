@@ -1,4 +1,4 @@
-<!--- Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com> -->
+<!--- Copyright (C) Lightbend Inc. <https://www.lightbend.com> -->
 # Handling asynchronous results
 
 ## Make controllers asynchronous
@@ -25,7 +25,7 @@ Play asynchronous API methods give you a `CompletionStage`. This is the case whe
 
 In this case, using `CompletionStage.thenApply` will execute the completion stage in the same calling thread as the previous task.  This is fine when you have a small amount of CPU bound logic with no blocking.
 
-A simple way to execute a block of code asynchronously and to get a `CompletionStage` is to use the `CompletionStage.supplyAsync()` method:
+A simple way to execute a block of code asynchronously and to get a `CompletionStage` is to use the `CompletableFuture.supplyAsync()` method:
 
 @[promise-async](code/javaguide/async/JavaAsync.java)
 
@@ -78,4 +78,3 @@ It is often useful to handle time-outs properly, to avoid having the web browser
 @[timeout](code/javaguide/async/JavaAsync.java)
 
 > **Note:** Timeout is not the same as cancellation -- even in case of timeout, the given future will still complete, even though that completed value is not returned.
-

@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.mvc;
 
 import com.typesafe.config.Config;
@@ -101,8 +102,12 @@ public class HttpFormsTest {
           assertThat(myForm.hasGlobalErrors()).isFalse();
           Money money = myForm.get();
           assertThat(money.getAmount()).isEqualTo(new BigDecimal("1234567.89"));
-          assertThat(copyFormWithoutRawData(myForm, app).field("amount").getValue().get())
-              .isEqualTo("1 234 567,89");
+          String amount = copyFormWithoutRawData(myForm, app).field("amount").getValue().get();
+          assertThat(amount)
+              .isEqualTo(
+                  amount.contains(" ")
+                      ? "1 234 567,89"
+                      : "1 234 567,89"); // Java 13+ uses different whitespaces
           // Parse french input with english formatter
           ctx.changeLang("en");
           myForm = formFactory.form(Money.class).bindFromRequest();
@@ -126,8 +131,12 @@ public class HttpFormsTest {
           assertThat(myForm.hasGlobalErrors()).isFalse();
           money = myForm.get();
           assertThat(money.getAmount()).isEqualTo(new BigDecimal("1234567"));
-          assertThat(copyFormWithoutRawData(myForm, app).field("amount").getValue().get())
-              .isEqualTo("1 234 567");
+          amount = copyFormWithoutRawData(myForm, app).field("amount").getValue().get();
+          assertThat(amount)
+              .isEqualTo(
+                  amount.contains(" ")
+                      ? "1 234 567"
+                      : "1 234 567"); // Java 13+ uses different whitespaces
           // Parse english input with english formatter
           ctx.changeLang("en");
           myForm = formFactory.form(Money.class).bindFromRequest();

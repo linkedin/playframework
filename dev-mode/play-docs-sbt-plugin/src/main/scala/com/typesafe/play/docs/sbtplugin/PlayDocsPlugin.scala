@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package com.typesafe.play.docs.sbtplugin
 
 import java.io.Closeable
@@ -295,7 +296,7 @@ object PlayDocsPlugin extends AutoPlugin with PlayDocsPluginCompat {
         buildDocHandler,
         translationReport,
         forceTranslationReport,
-        new java.lang.Integer(port)
+        java.lang.Integer.valueOf(port)
       )
       .asInstanceOf[ReloadableServer]
 

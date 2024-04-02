@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
 import BuildSettings._
 import Dependencies._
@@ -16,7 +16,7 @@ import sbt.ScriptedPlugin._
 import sbt._
 import sbt.io.Path._
 
-lazy val BuildLinkProject = PlayNonCrossBuiltProject("Build-Link", "dev-mode/build-link")
+lazy val BuildLinkProject = PlayCrossBuiltProject("Build-Link", "dev-mode/build-link")
   .dependsOn(PlayExceptionsProject)
 
 // run-support project is only compiled against sbt scala version
@@ -45,9 +45,9 @@ lazy val SbtRoutesCompilerProject = PlaySbtProject("Sbt-Routes-Compiler", "dev-m
 lazy val StreamsProject = PlayCrossBuiltProject("Play-Streams", "core/play-streams")
   .settings(libraryDependencies ++= streamsDependencies)
 
-lazy val PlayExceptionsProject = PlayNonCrossBuiltProject("Play-Exceptions", "core/play-exceptions")
+lazy val PlayExceptionsProject = PlayCrossBuiltProject("Play-Exceptions", "core/play-exceptions")
 
-lazy val PlayNettyUtilsProject = PlayNonCrossBuiltProject("Play-Netty-Utils", "web/play-netty-utils")
+lazy val PlayNettyUtilsProject = PlayCrossBuiltProject("Play-Netty-Utils", "web/play-netty-utils")
   .settings(
     javacOptions in (Compile, doc) += "-Xdoclint:none",
     libraryDependencies ++= nettyUtilsDependencies
@@ -418,7 +418,6 @@ lazy val publishedProjects = Seq[ProjectReference](
 
 lazy val PlayFramework = Project("Play-Framework", file("."))
   .enablePlugins(PlayRootProject)
-  .enablePlugins(PlayWhitesourcePlugin)
   .settings(
     playCommonSettings,
     scalaVersion := (scalaVersion in PlayProject).value,

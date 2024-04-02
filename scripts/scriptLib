@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+# Copyright (C) Lightbend Inc. <https://www.lightbend.com>
 
 # Lib for CI scripts
 
@@ -10,6 +10,7 @@ BASEDIR=$DIR/..
 export DOCUMENTATION=$BASEDIR/documentation
 
 export CURRENT_BRANCH=${TRAVIS_BRANCH}
+export JAVA_TOOL_OPTIONS="--add-exports=java.base/sun.security.x509=ALL-UNNAMED --add-exports=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/sun.security.ssl=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/javax.net.ssl=ALL-UNNAMED"
 
 EXTRA_OPTS=""
 
@@ -30,17 +31,17 @@ printMessage() {
 }
 
 runSbt() {
-  sbt ${EXTRA_OPTS} --warn -jvm-opts ${BASEDIR}/.travis-jvmopts 'set concurrentRestrictions in Global += Tags.limitAll(1)' "$@" | grep --line-buffered -v 'Resolving \|Generating '
+  sbt ${EXTRA_OPTS} --warn 'set concurrentRestrictions in Global += Tags.limitAll(1)' "$@" | grep --line-buffered -v 'Resolving \|Generating '
 }
 
 runSbtNoisy() {
-  sbt ${EXTRA_OPTS} -jvm-opts ${BASEDIR}/.travis-jvmopts 'set concurrentRestrictions in Global += Tags.limitAll(1)' "$@" | grep --line-buffered -v 'Resolving \|Generating '
+  sbt ${EXTRA_OPTS} 'set concurrentRestrictions in Global += Tags.limitAll(1)' "$@" | grep --line-buffered -v 'Resolving \|Generating '
 }
 
 # Runs code formating validation in the current directory
 scalafmtValidation() {
   printMessage "VALIDATE SCALA CODE FORMATTING"
-  runSbtNoisy scalafmtAll scalafmtSbt
+  runSbtNoisy +scalafmtAll scalafmtSbt
   git diff --exit-code || (
     echo "[error] ERROR: Scalafmt test failed for $1 source."
     echo "[error] To fix, format your sources using 'sbt scalafmtAll scalafmtAll' before submitting a pull request."

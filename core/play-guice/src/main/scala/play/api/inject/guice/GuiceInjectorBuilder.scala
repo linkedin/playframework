@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.api.inject
 package guice
 
@@ -374,7 +375,7 @@ trait GuiceableModuleConversions {
    */
   def guice(bindings: Seq[PlayBinding[_]], binderOptions: Set[BinderOption]): GuiceModule = {
     new com.google.inject.AbstractModule {
-      def configure(): Unit = {
+      override def configure(): Unit = {
         binderOptions.foreach(_(binder))
         for (b <- bindings) {
           val binding = b.asInstanceOf[PlayBinding[Any]]

@@ -1,9 +1,11 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.libs.ws
 
 import akka.stream.Materializer
+import akka.testkit.NoMaterializer
 import play.api.mvc.Results._
 import play.api.mvc._
 import play.api.test._

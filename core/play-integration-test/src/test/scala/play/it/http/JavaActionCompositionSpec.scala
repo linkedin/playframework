@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.it.http
 
 import play.api.Application
@@ -113,7 +114,7 @@ class BuiltInComponentsJavaActionCompositionSpec extends JavaActionCompositionSp
         configuration
           .get[Option[String]]("play.http.actionCreator")
           .map(Class.forName)
-          .map(c => c.newInstance().asInstanceOf[ActionCreator])
+          .map(c => c.getDeclaredConstructor().newInstance().asInstanceOf[ActionCreator])
           .getOrElse(new DefaultActionCreator)
       }
     }

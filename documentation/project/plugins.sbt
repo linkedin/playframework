@@ -1,4 +1,4 @@
-// Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+// Copyright (C) Lightbend Inc. <https://www.lightbend.com>
 
 // Comment to get more information during initialization
 logLevel := Level.Warn
@@ -19,4 +19,4 @@ addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.4.4")
 addSbtPlugin("org.scalameta"     % "sbt-scalafmt"       % "2.0.0")
 
 // Required for Tutorial
-addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.3.15")
+addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.3.16")

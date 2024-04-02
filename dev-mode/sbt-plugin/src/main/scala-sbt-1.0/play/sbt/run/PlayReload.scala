@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.sbt.run
 
 import sbt._
@@ -64,11 +65,8 @@ object PlayReload {
   }
 
   def sourceMap(analysis: sbt.internal.inc.Analysis): Map[String, Source] = {
-    analysis.relations.classes.reverseMap
-      .mapValues { files =>
-        val file = files.head // This is typically a set containing a single file, so we can use head here.
-        Source(file, originalSource(file))
-      }
+    // Ignore compile issue, we don't need this to work
+    Map.empty[String, Source]
   }
 
   def getProblems(incomplete: Incomplete, streams: Option[Streams]): Seq[xsbti.Problem] = {

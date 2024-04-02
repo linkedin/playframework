@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.data;
 
 import com.google.common.collect.ImmutableList;
@@ -101,7 +102,7 @@ public class Form<T> {
 
   protected T blankInstance() {
     try {
-      return backedType.newInstance();
+      return backedType.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new RuntimeException(
           "Cannot instantiate " + backedType + ". It must have a default constructor", e);

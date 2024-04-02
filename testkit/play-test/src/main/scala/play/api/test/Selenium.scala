@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.api.test
 
 import java.util.concurrent.TimeUnit
 
-import com.google.common.base.Function
 import org.fluentlenium.adapter.FluentAdapter
 import org.fluentlenium.core.domain.FluentList
 import org.fluentlenium.core.domain.FluentWebElement
@@ -13,6 +13,8 @@ import org.openqa.selenium._
 import org.openqa.selenium.firefox._
 import org.openqa.selenium.htmlunit._
 import org.openqa.selenium.support.ui.FluentWait
+
+import scala.compat.java8.FunctionConverters._
 
 /**
  * A test browser (Using Selenium WebDriver) with the FluentLenium API (https://github.com/Fluentlenium/FluentLenium).
@@ -58,7 +60,7 @@ case class TestBrowser(webDriver: WebDriver, baseUrl: Option[String]) extends Fl
         block
       }
     }
-    wait.until(f)
+    wait.until(f.asJava)
   }
 
   /**
@@ -120,7 +122,7 @@ object WebDriverFactory {
    * @return The driver instance
    */
   def apply[D <: WebDriver](clazz: Class[D]): WebDriver = {
-    val driver = clazz.newInstance
+    val driver = clazz.getDeclaredConstructor().newInstance()
     // Driver-specific configuration
     driver match {
       case htmlunit: HtmlUnitDriver => htmlunit.setJavascriptEnabled(true)

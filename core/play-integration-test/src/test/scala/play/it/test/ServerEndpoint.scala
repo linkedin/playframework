@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.it.test
 
 import java.security.KeyStore
@@ -11,7 +12,7 @@ import play.api.Application
 import play.api.Mode
 import play.core.ApplicationProvider
 import play.core.server.ServerConfig
-import play.core.server.ssl.FakeKeyStore
+import com.typesafe.sslconfig.ssl.FakeKeyStore
 import play.it.test.HttpsEndpoint.ServerSSL
 import play.server.api.SSLEngineProvider
 

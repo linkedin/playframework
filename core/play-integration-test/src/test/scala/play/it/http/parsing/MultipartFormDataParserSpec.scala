@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.it.http.parsing
 
 import akka.NotUsed
@@ -62,7 +63,9 @@ class MultipartFormDataParserSpec extends PlaySpecification with WsTestClient {
       |the third file (with 'Content-Disposition: file' instead of 'form-data' as used in webhook callbacks of some scanners, see issue #8527)
       |
       |--aabbccddee--
-      |""".stripMargin.lines.mkString("\r\n")
+      |""".stripMargin.linesWithSeparators
+      .map(_.stripLineEnd)
+      .mkString("\r\n") //TODO replace with `lines` when scala 2.13.0-RC1 is released
 
   def parse(implicit app: Application) = app.injector.instanceOf[PlayBodyParsers]
 

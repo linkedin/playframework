@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
 import java.util.regex.Pattern
 
@@ -11,13 +11,13 @@ import com.typesafe.tools.mima.core._
 import com.typesafe.tools.mima.plugin.MimaKeys._
 import com.typesafe.tools.mima.plugin.MimaPlugin._
 import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
+import de.heikoseeberger.sbtheader.FileType
+import de.heikoseeberger.sbtheader.CommentStyle
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport._
 
-import bintray.BintrayPlugin.autoImport._
 import interplay._
 import interplay.Omnidoc.autoImport._
 import interplay.PlayBuildBase.autoImport._
-import sbtwhitesource.WhiteSourcePlugin.autoImport._
 
 import scala.sys.process.stringToProcess
 import scala.util.control.NonFatal
@@ -48,11 +48,14 @@ object BuildSettings {
   }
 
   val fileHeaderSettings = Seq(
-    headerEmptyLine := false,
     excludeFilter in (Compile, headerSources) := HiddenFileFilter ||
       fileUriRegexFilter(".*/netty/utils/.*") || fileUriRegexFilter(".*/inject/SourceProvider.java$") ||
       fileUriRegexFilter(".*/libs/reflect/.*"),
-    headerLicense := Some(HeaderLicense.Custom("Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>"))
+    headerLicense := Some(HeaderLicense.Custom("Copyright (C) Lightbend Inc. <https://www.lightbend.com>")),
+    headerMappings ++= Map(
+      FileType.xml  -> CommentStyle.xmlStyleBlockComment,
+      FileType.conf -> CommentStyle.hashLineComment
+    )
   )
 
   def evictionSettings: Seq[Setting[_]] = Seq(
@@ -74,7 +77,8 @@ object BuildSettings {
     resolvers ++= Seq(
       Resolver.sonatypeRepo("releases"),
       Resolver.typesafeRepo("releases"),
-      Resolver.typesafeIvyRepo("releases")
+      Resolver.typesafeIvyRepo("releases"),
+      Resolver.sbtPluginRepo("releases"), // weird sbt-pgp/play docs/vegemite issue
     ),
     evictionSettings,
     ivyConfigurations ++= Seq(DocsApplication, SourcesApplication),
@@ -91,7 +95,6 @@ object BuildSettings {
     testListeners in (Test, test) := Nil,
     javaOptions in Test ++= Seq("-XX:MaxMetaspaceSize=384m", "-Xmx512m", "-Xms128m"),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
-    bintrayPackage := "play-sbt-plugin",
     apiURL := {
       val v = version.value
       if (isSnapshot.value) {
@@ -104,16 +107,20 @@ object BuildSettings {
     apiMappings += scalaInstance.value.libraryJar -> url(
       raw"""http://scala-lang.org/files/archive/api/${scalaInstance.value.actualVersion}/index.html"""
     ),
-    apiMappings += {
+    apiMappings ++= {
       // Maps JDK 1.8 jar into apidoc.
-      val rtJar: String = System
-        .getProperty("sun.boot.class.path")
-        .split(java.io.File.pathSeparator)
-        .collectFirst {
-          case str: String if str.endsWith(java.io.File.separator + "rt.jar") => str
-        }
-        .get // fail hard if not found
-      file(rtJar) -> url(Docs.javaApiUrl)
+      val rtJar = sys.props
+        .get("sun.boot.class.path")
+        .flatMap(
+          cp =>
+            cp.split(java.io.File.pathSeparator).collectFirst {
+              case str if str.endsWith(java.io.File.separator + "rt.jar") => str
+            }
+        )
+      rtJar match {
+        case None        => Map.empty
+        case Some(rtJar) => Map(file(rtJar) -> url(Docs.javaApiUrl))
+      }
     },
     apiMappings ++= {
       // Finds appropriate scala apidoc from dependencies when autoAPIMappings are insufficient.
@@ -243,7 +250,13 @@ object BuildSettings {
       // Add play.api.inject.BindingTarget asJava method
       ProblemFilters.exclude[ReversedMissingMethodProblem]("play.api.inject.BindingTarget.asJava"),
       // Add play.api.inject.QualifierAnnotation asJava method
-      ProblemFilters.exclude[ReversedMissingMethodProblem]("play.api.inject.QualifierAnnotation.asJava")
+      ProblemFilters.exclude[ReversedMissingMethodProblem]("play.api.inject.QualifierAnnotation.asJava"),
+      // Fix compile error on JDK15: Use direct AlgorithmId.get() (is private[play] anyway)
+      ProblemFilters
+        .exclude[IncompatibleMethTypeProblem]("play.core.server.ssl.CertificateGenerator.generateCertificate"),
+      // Removing NoMaterializer
+      ProblemFilters.exclude[MissingClassProblem]("play.api.test.NoMaterializer$"),
+      ProblemFilters.exclude[MissingClassProblem]("play.api.test.NoMaterializer"),
     ),
     unmanagedSourceDirectories in Compile += {
       (sourceDirectory in Compile).value / s"scala-${scalaBinaryVersion.value}"

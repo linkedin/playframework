@@ -1,12 +1,14 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.mvc
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import akka.testkit.TestKit
+import akka.util.ByteString
 import com.fasterxml.jackson.core.io.CharacterEscapes
 import com.fasterxml.jackson.core.io.SerializedString
 import com.fasterxml.jackson.core.JsonEncoding
@@ -50,7 +52,7 @@ class StatusHeaderSpec extends TestKit(ActorSystem("StatusHeaderSpec")) with Spe
       val result       = statusHeader.sendJson(jsonNode, JsonEncoding.UTF8)
 
       val content = Await.result(for {
-        byteString <- result.body.dataStream.runWith(Sink.head, materializer)
+        byteString <- result.body.dataStream.runWith(Sink.head[ByteString], materializer)
       } yield byteString.decodeString("UTF-8"), Duration.Inf)
 
       content must_== "{\"field\":\"value\\u0026\"}"

@@ -1,15 +1,16 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.api.test
 
 import java.nio.file.Path
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-import akka.actor.Cancellable
 import akka.stream.scaladsl.Source
 import akka.stream._
+import akka.testkit.NoMaterializer
 import akka.util.ByteString
 import akka.util.Timeout
 import org.openqa.selenium.WebDriver
@@ -29,7 +30,6 @@ import play.twirl.api.Content
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext
-import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.reflectiveCalls
@@ -214,7 +214,7 @@ trait DefaultAwaitTimeout {
    * for the full length of time to show that nothing has happened in that time.
    * If the value is too high then we'll spend a lot of time waiting during normal
    * usage. If it is too low, however, we may miss events that occur after the
-   * timeout has finished. This is a necessary tradeoff.
+   * timeout has finished. This is a necessary trade-off.
    *
    * Where possible, tests should avoid using a NegativeTimeout. Tests will often
    * know exactly when an event should occur. In this case they can perform a
@@ -693,27 +693,4 @@ object NoTemporaryFileCreator extends Files.TemporaryFileCreator {
   override def delete(file: Files.TemporaryFile): Try[Boolean] = {
     throw new UnsupportedOperationException(s"Cannot delete temporary file at $file")
   }
-}
-
-/**
- * In 99% of cases, when running tests against the result body, you don't actually need a materializer since it's a
- * strict body. So, rather than always requiring an implicit materializer, we use one if provided, otherwise we have
- * a default one that simply throws an exception if used.
- */
-object NoMaterializer extends Materializer {
-  override def withNamePrefix(name: String): Materializer =
-    throw new UnsupportedOperationException("NoMaterializer cannot be named")
-  override def materialize[Mat](runnable: Graph[ClosedShape, Mat]): Mat =
-    throw new UnsupportedOperationException("NoMaterializer cannot materialize")
-  override def materialize[Mat](runnable: Graph[ClosedShape, Mat], initialAttributes: Attributes): Mat =
-    throw new UnsupportedOperationException("NoMaterializer cannot materialize")
-
-  override def executionContext: ExecutionContextExecutor =
-    throw new UnsupportedOperationException("NoMaterializer does not provide an ExecutionContext")
-
-  def scheduleOnce(delay: FiniteDuration, task: Runnable): Cancellable =
-    throw new UnsupportedOperationException("NoMaterializer cannot schedule a single event")
-
-  def schedulePeriodically(initialDelay: FiniteDuration, interval: FiniteDuration, task: Runnable): Cancellable =
-    throw new UnsupportedOperationException("NoMaterializer cannot schedule a repeated event")
 }

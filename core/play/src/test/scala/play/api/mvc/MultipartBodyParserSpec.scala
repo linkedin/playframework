@@ -1,15 +1,18 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.api.mvc
 
 import java.io.IOException
 
+import akka.stream._
+import akka.stream.scaladsl._
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Source
 import akka.util.ByteString
+
 import org.specs2.mutable.Specification
+
 import play.core.test.FakeHeaders
 import play.core.test.FakeRequest
 
@@ -59,7 +62,7 @@ class MultipartBodyParserSpec extends Specification {
       )
 
       val response = playBodyParsers.multipartFormData.apply(request).run(body)
-      Await.result(response, Duration.Inf) must throwA[IOException]
+      Await.result(response, Duration.Inf) must throwA[IOOperationIncompleteException]
     }
   }
 }

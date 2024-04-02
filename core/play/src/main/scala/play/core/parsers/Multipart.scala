@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.core.parsers
 
 import scala.annotation.tailrec
@@ -375,8 +376,10 @@ object Multipart {
             case headerEnd =>
               val headerString = input.slice(headerStart, headerEnd).utf8String
               val headers: Map[String, String] =
-                headerString.lines.map { header =>
-                  val key :: value = header.trim.split(":").toList
+                headerString.linesWithSeparators
+                  .map(_.stripLineEnd)
+                  .map { header => //TODO replace with `lines` when scala 2.13.0-RC1 is released
+                    val key :: value = header.trim.split(":").toList
 
                   (key.trim.toLowerCase(java.util.Locale.ENGLISH), value.mkString(":").trim)
 

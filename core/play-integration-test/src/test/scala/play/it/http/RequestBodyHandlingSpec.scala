@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.it.http
 
 import java.util.zip.Deflater
@@ -76,7 +77,7 @@ trait RequestBodyHandlingSpec extends PlaySpecification with ServerIntegrationSp
 
       val client = new BasicHttpClient(port, false)
       val response = client.sendRaw(
-        output,
+        output.take(compressedDataLength),
         Map(
           "Content-Type"     -> "text/plain",
           "Content-Length"   -> compressedDataLength.toString,
