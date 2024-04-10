@@ -14,12 +14,11 @@ trait RoutesGenerator {
    * Generate a router
    *
    * @param task The routes compile task
-   * @param generatedDir The directory source code will be generated into
    * @param namespace The namespace of the router
    * @param rules The routing rules
    * @return A sequence of output filenames to file contents
    */
-  def generate(task: RoutesCompilerTask, generatedDir: File, namespace: Option[String], rules: List[Rule]): Seq[(String, String)]
+  def generate(task: RoutesCompilerTask, namespace: Option[String], rules: List[Rule]): Seq[(String, String)]
 
   /**
    * An identifier for this routes generator.
@@ -50,13 +49,12 @@ object StaticRoutesGenerator extends RoutesGenerator {
 
   val id = "static"
 
-  def generate(task: RoutesCompilerTask, generatedDir: File, namespace: Option[String], rules: List[Rule]): Seq[(String, String)] = {
+  def generate(task: RoutesCompilerTask, namespace: Option[String], rules: List[Rule]): Seq[(String, String)] = {
 
     val folder = namespace.map(_.replace('.', '/') + "/").getOrElse("") + "/"
 
-    val source = generatedDir.toPath.resolve(folder).relativize(task.file.toPath)
-    val sourceInfo = RoutesSourceInfo(source.toString.replace(File.separator, "/"))
-
+    val sourceInfo =
+      RoutesSourceInfo(task.file.getCanonicalPath.replace(File.separator, "/"), new java.util.Date().toString)
     val routes = rules.collect { case r: Route => r }
 
     val routesPrefixFiles = Seq(folder + RoutesPrefixFile -> generateRoutesPrefix(sourceInfo, namespace))
@@ -186,13 +184,12 @@ object InjectedRoutesGenerator extends RoutesGenerator {
 
   case class Dependency[+T <: Rule](ident: String, clazz: String, rule: T)
 
-  def generate(task: RoutesCompilerTask, generatedDir: File, namespace: Option[String], rules: List[Rule]): Seq[(String, String)] = {
+  def generate(task: RoutesCompilerTask, namespace: Option[String], rules: List[Rule]): Seq[(String, String)] = {
 
     val folder = namespace.map(_.replace('.', '/') + "/").getOrElse("") + "/"
 
-    val source = generatedDir.toPath.resolve(folder).relativize(task.file.toPath).toString.replace(File.separator, "/")
-    val sourceInfo = RoutesSourceInfo(source)
-
+    val sourceInfo =
+      RoutesSourceInfo(task.file.getCanonicalPath.replace(File.separator, "/"), new java.util.Date().toString)
     val routes = rules.collect { case r: Route => r }
 
     val routesPrefixFiles = Seq(folder + RoutesPrefixFile -> generateRoutesPrefix(sourceInfo, namespace))

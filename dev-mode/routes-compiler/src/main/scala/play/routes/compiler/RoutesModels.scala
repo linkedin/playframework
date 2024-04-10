@@ -150,4 +150,4 @@ case class RoutesCompilationError(source: File, message: String, line: Option[In
 /**
  * Information about the routes source file
  */
-case class RoutesSourceInfo(source: String)
+case class RoutesSourceInfo(source: String, date: String)

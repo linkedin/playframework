@@ -3,6 +3,7 @@
 @(sourceInfo: RoutesSourceInfo, pkg: Option[String], packageName: String, controllers: Seq[String])
 // @@GENERATOR:play-routes-compiler
 // @@SOURCE:@sourceInfo.source
+// @@DATE:@sourceInfo.date
 
 package @packageName;
 
