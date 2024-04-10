@@ -12,6 +12,25 @@ find ~/local-repo -type f -name "*<version>.ivy" -exec sed -i.bak 's/\<conf name
 # ^replace <version> with the version you just published
 ```
 
+# Publish to internal JFrog
+
+1. Create Jfrog account by requesting access through IT.
+2. Get access to the 'playframework' repo by contacting the Jfrog admin.
+3. Generate a token by clicking your username > Set Me Up > Maven > Generate Token.
+4. Create a credentials file at `~/.sbt/.credentials` with the following content:
+```
+realm=Artifactory Realm
+host=linkedin.jfrog.io
+user=<USERNAME>
+password=<TOKEN>
+```
+5. Run `sbt` and execute the following commands:
+```
+set every publishTo := Some("Artifactory Realm" at "https://linkedin.jfrog.io/artifactory/playframework");
+set every credentials := List(Credentials(Path.userHome / ".sbt" / ".credentials"))
+publish
+```
+
 [![Gitter](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/playframework/playframework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [<img src="https://img.shields.io/travis/playframework/playframework.svg"/>](https://travis-ci.org/playframework/playframework) [![Maven](https://img.shields.io/maven-central/v/com.typesafe.play/play_2.11.svg)](http://mvnrepository.com/artifact/com.typesafe.play/play_2.11)
 
 
