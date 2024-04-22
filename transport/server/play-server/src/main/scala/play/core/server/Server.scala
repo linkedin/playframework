@@ -8,6 +8,7 @@ import java.util.function.{ Function => JFunction }
 import com.typesafe.config.ConfigFactory
 import play.api.ApplicationLoader.Context
 import play.api.http.DevHttpErrorHandler
+import play.api.http.DefaultHttpErrorHandler
 import play.api.http.HttpErrorHandler
 import play.api.http.Port
 import play.api.routing.Router
@@ -52,12 +53,12 @@ trait Server extends ReloadableServer {
    * - If an exception is thrown.
    *
    * NOTE: This will use the ApplicationProvider of the server to get the application instance.
-   *       Use {@code Server.getHandlerFor(request, provider)} to pass a specific application instance
+   *       Use {@code Server.getHandlerFor(request, provider, fallbackErrorHandler)} to pass a specific application instance
    */
   @deprecated("Use Server.getHandlerFor instead", "2.6.13")
   def getHandlerFor(request: RequestHeader): Either[Future[Result], (RequestHeader, Handler, Application)] = {
     val appProvider = applicationProvider
-    val result      = Server.getHandlerFor(request, appProvider)
+    val result      = Server.getHandlerFor(request, appProvider, DefaultHttpErrorHandler)
     result.right.map { case (rh, h) => (rh, h, appProvider.get.get) }
   }
 
