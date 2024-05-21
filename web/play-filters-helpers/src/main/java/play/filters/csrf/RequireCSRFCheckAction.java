@@ -78,10 +78,10 @@ public class RequireCSRFCheckAction extends Action<RequireCSRFCheck> {
 
     RequestHeader request = csrfActionHelper.tagRequestFromHeader(ctx._requestHeader());
     // Check for bypass
-    if (!csrfActionHelper.requiresCsrfCheck(taggedRequest)
-        || (config.checkContentType().apply(req.asScala().contentType()) != Boolean.TRUE
-            && !csrfActionHelper.hasInvalidContentType(req.asScala()))) {
-      return delegate.call(req);
+    if (!csrfActionHelper.requiresCsrfCheck(request)
+        || (config.checkContentType().apply(ctx.request().asScala().contentType()) != Boolean.TRUE
+            && !csrfActionHelper.hasInvalidContentType(ctx.request().asScala()))) {
+      return delegate.call(ctx);
     } else {
       // Get token from cookie/session
       Option<String> headerToken = csrfActionHelper.getTokenToValidate(request);
