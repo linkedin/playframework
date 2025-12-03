@@ -184,7 +184,7 @@ class CSRFFilterSpec extends CSRFCommonSpecs {
 
     val notBufferedFakeApp = GuiceApplicationBuilder()
       .configure(
-        "play.http.secret.key"              -> "foobar",
+        "play.http.secret.key"              -> CRYPTO_SECRET,
         "play.filters.csrf.body.bufferSize" -> "200",
         "play.http.filters"                 -> classOf[CsrfFilters].getName
       )
